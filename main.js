@@ -7,13 +7,13 @@ function generateID() {
 	return +new Date();
 }
 
-function generateBookObject(id, title, author, year, isCompleted) {
+function generateBookObject(id, title, author, year, isComplete) {
 	return {
 		id,
 		title,
 		author,
 		year,
-		isCompleted,
+		isComplete,
 	};
 }
 
@@ -22,7 +22,7 @@ function findBook(bookId) {
 }
 
 function makeBook(bookObject) {
-	const { id, title, author, year, isCompleted } = bookObject;
+	const { id, title, author, year, isComplete } = bookObject;
 
 	const bookTitle = document.createElement("h3");
 	bookTitle.innerText = title;
@@ -43,9 +43,9 @@ function makeBook(bookObject) {
 
 	const undoButton = document.createElement("button");
 	undoButton.classList.add("green");
-	undoButton.innerText = isCompleted ? "Belum selesai dibaca" : "Sudah dibaca";
+	undoButton.innerText = isComplete ? "Belum selesai dibaca" : "Sudah dibaca";
 	undoButton.addEventListener("click", () => {
-		isCompleted ? undoTaskFromCompleted(id) : addTaskToCompleted(id);
+		isComplete ? undoTaskFromCompleted(id) : addTaskToCompleted(id);
 	});
 
 	const removeButton = document.createElement("button");
@@ -64,7 +64,7 @@ function makeBook(bookObject) {
 function undoTaskFromCompleted(bookId) {
 	const bookTarget = findBook(bookId);
 	if (bookTarget) {
-		bookTarget.isCompleted = false;
+		bookTarget.isComplete = false;
 		document.dispatchEvent(new Event(RENDER_EVENT));
 		saveData();
 	}
@@ -82,7 +82,7 @@ function removeTaskFromCompleted(bookId) {
 function addTaskToCompleted(bookId) {
 	const bookTarget = findBook(bookId);
 	if (bookTarget) {
-		bookTarget.isCompleted = true;
+		bookTarget.isComplete = true;
 		document.dispatchEvent(new Event(RENDER_EVENT));
 		saveData();
 	}
@@ -91,8 +91,8 @@ function addTaskToCompleted(bookId) {
 function addBook() {
 	const titlebook = document.getElementById("inputBookTitle").value;
 	const authorBook = document.getElementById("inputBookAuthor").value;
-	const yearOfBook = document.getElementById("inputBookYear").value;
-	const isCompleted = document.getElementById("inputBookIsComplete").checked;
+	const yearOfBook = Number(document.getElementById("inputBookYear").value)
+	const isComplete = document.getElementById("inputBookIsComplete").checked;
 
 	const generatedID = generateID();
 
@@ -101,7 +101,7 @@ function addBook() {
 		titlebook,
 		authorBook,
 		yearOfBook,
-		isCompleted
+		isComplete
 	);
 
 	books.push(bookObject);
@@ -109,7 +109,7 @@ function addBook() {
 	document.dispatchEvent(new Event(RENDER_EVENT));
 	saveData();
 
-	if (isCompleted) {
+	if (isComplete) {
 		addTaskToCompleted(generatedID);
 	}
 }
@@ -164,7 +164,7 @@ document.addEventListener(RENDER_EVENT, () => {
 
 	for (const bookItem of books) {
 		const bookElement = makeBook(bookItem);
-		bookItem.isCompleted
+		bookItem.isComplete
 			? completeBookshelfList.append(bookElement)
 			: incompleteBookshelfList.append(bookElement);
 	}
